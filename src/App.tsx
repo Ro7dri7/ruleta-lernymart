@@ -129,6 +129,7 @@ export default function App() {
 
   const [mustSpin, setMustSpin] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [result, setResult] = useState<{
     label: string
     isLose: boolean
@@ -157,28 +158,29 @@ export default function App() {
   }, [options, prizeNumber])
 
   return (
-    <div className="min-h-screen">
-      <main className="mx-auto grid min-h-screen max-w-7xl gap-5 p-4 sm:gap-6 sm:p-6 lg:grid-cols-2 lg:items-start lg:gap-8 lg:p-6">
-        <ControlPanel
+    <div className="flex min-h-screen">
+      <ControlPanel
+        open={sidebarOpen}
+        onToggle={() => setSidebarOpen((value) => !value)}
+        options={options}
+        colors={colors}
+        branding={branding}
+        onOptionsChange={setOptions}
+        onColorsChange={setColors}
+        onBrandingChange={setBranding}
+      />
+
+      <main className="relative min-h-screen min-w-0 flex-1">
+        <WheelPreview
           options={options}
           colors={colors}
           branding={branding}
-          onOptionsChange={setOptions}
-          onColorsChange={setColors}
-          onBrandingChange={setBranding}
+          mustSpin={mustSpin}
+          prizeNumber={prizeNumber}
+          compact={sidebarOpen}
+          onSpin={handleSpin}
+          onStopSpinning={handleStopSpinning}
         />
-
-        <div className="lg:sticky lg:top-6">
-          <WheelPreview
-            options={options}
-            colors={colors}
-            branding={branding}
-            mustSpin={mustSpin}
-            prizeNumber={prizeNumber}
-            onSpin={handleSpin}
-            onStopSpinning={handleStopSpinning}
-          />
-        </div>
       </main>
 
       {result !== null && (

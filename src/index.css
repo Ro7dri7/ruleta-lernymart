@@ -113,3 +113,15 @@ body {
   width: 100% !important;
   height: 100% !important;
 }
+
+/* La flecha también usa alt="roulette-static"; hay que achicarla a propósito */
+.wheel-stage img[alt='roulette-static'] {
+  width: 15% !important;
+  max-width: 64px !important;
+  height: auto !important;
+  max-height: 64px !important;
+  right: 2% !important;
+  top: 2% !important;
+  object-fit: contain !important;
+  z-index: 25 !important;
+}
