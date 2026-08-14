@@ -10,18 +10,78 @@ import type {
 } from './types/wheel'
 
 const INITIAL_OPTIONS: WheelOption[] = [
-  { id: crypto.randomUUID(), option: 'Premio Mayor', isLose: false },
-  { id: crypto.randomUUID(), option: 'Descuento 20%', isLose: false },
-  { id: crypto.randomUUID(), option: 'Regalo sorpresa', isLose: false },
-  { id: crypto.randomUUID(), option: 'Inténtalo de nuevo', isLose: true },
-  { id: crypto.randomUUID(), option: 'Vale $10', isLose: false },
-  { id: crypto.randomUUID(), option: 'Envío gratis', isLose: false },
+  {
+    id: crypto.randomUUID(),
+    option:
+      'Espacio destacado en la web principal del Marketplace por 01 semana',
+    isLose: false,
+  },
+  {
+    id: crypto.randomUUID(),
+    option: 'No pierdas la Fe',
+    isLose: true,
+  },
+  {
+    id: crypto.randomUUID(),
+    option:
+      'Mentoría gratuita 1:1 para estructurar tu infoproducto con el equipo de onboarding',
+    isLose: false,
+  },
+  {
+    id: crypto.randomUUID(),
+    option: 'Sigue intentando',
+    isLose: true,
+  },
+  {
+    id: crypto.randomUUID(),
+    option:
+      'Exoneración de la comisión del 8% por 3 meses al publicar tu primer ebook/curso',
+    isLose: false,
+  },
+  {
+    id: crypto.randomUUID(),
+    option: 'Otro intento',
+    isLose: true,
+  },
+  {
+    id: crypto.randomUUID(),
+    option:
+      'Espacio destacado en la web principal del Marketplace por 01 semana',
+    isLose: false,
+  },
+  {
+    id: crypto.randomUUID(),
+    option: 'No pierdas la Fe',
+    isLose: true,
+  },
+  {
+    id: crypto.randomUUID(),
+    option:
+      'Mentoría gratuita 1:1 para estructurar tu infoproducto con el equipo de onboarding',
+    isLose: false,
+  },
+  {
+    id: crypto.randomUUID(),
+    option: 'Sigue intentando',
+    isLose: true,
+  },
+  {
+    id: crypto.randomUUID(),
+    option:
+      'Exoneración de la comisión del 8% por 3 meses al publicar tu primer ebook/curso',
+    isLose: false,
+  },
+  {
+    id: crypto.randomUUID(),
+    option: 'Otro intento',
+    isLose: true,
+  },
 ]
 
 const INITIAL_COLORS: WheelColors = {
-  backgroundColor: '#1a7a72',
-  secondaryBackgroundColor: '#e85a3c',
-  textColor: '#ffffff',
+  backgroundColor: '#FFC847',
+  secondaryBackgroundColor: '#000000',
+  textColor: '#000000',
 }
 
 const INITIAL_BRANDING: WheelBranding = {

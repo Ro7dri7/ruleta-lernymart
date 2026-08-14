@@ -56,18 +56,18 @@ export function WheelPreview({
               colors.backgroundColor,
               colors.secondaryBackgroundColor,
             ]}
-            textColors={[colors.textColor]}
-            outerBorderColor={colors.backgroundColor}
+            textColors={[colors.textColor, '#FFFFFF']}
+            outerBorderColor={colors.secondaryBackgroundColor}
             outerBorderWidth={6}
             innerRadius={22}
             innerBorderColor="#ffffff"
             innerBorderWidth={4}
             radiusLineColor="#ffffff"
             radiusLineWidth={2}
-            fontSize={14}
+            fontSize={options.length > 8 ? 9 : 14}
             fontFamily="Manrope"
             fontWeight={700}
-            textDistance={62}
+            textDistance={options.length > 8 ? 55 : 62}
             spinDuration={0.85}
             disableInitialAnimation
           />
