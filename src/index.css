@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Syne', sans-serif;
+  --font-sans: 'Manrope', sans-serif;
+
+  --color-ink: #102a2e;
+  --color-ink-soft: #3d5a5f;
+  --color-surface: #ffffff;
+  --color-mint: #e8f6f2;
+  --color-teal: #1a7a72;
+  --color-teal-deep: #0f4f4a;
+  --color-coral: #e85a3c;
+  --color-coral-deep: #c9442a;
+  --color-gold: #f0b429;
+  --color-sky: #d6eef8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, #d6eef8 0%, transparent 55%),
+    radial-gradient(ellipse 70% 45% at 95% 5%, #c8efe6 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, #ffe8e0 0%, transparent 45%),
+    linear-gradient(165deg, #f4fbf9 0%, #eef6fa 45%, #f7f3ef 100%);
+  background-attachment: fixed;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgb(232 90 60 / 0.35),
+      0 12px 28px rgb(232 90 60 / 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgb(232 90 60 / 0),
+      0 16px 36px rgb(232 90 60 / 0.35);
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-float {
+  animation: float-soft 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.2s ease-in-out infinite;
+}
+
+.animate-modal-in {
+  animation: modal-in 0.35s ease-out forwards;
+}
+
+.animate-backdrop-in {
+  animation: backdrop-in 0.25s ease-out forwards;
+}
+
+/* Fuerza a react-custom-roulette a respetar el tamaño del contenedor */
+.wheel-stage > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1;
+  margin-inline: auto;
+}
+
+.wheel-stage canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
