@@ -20,8 +20,8 @@ const SHORT_LABEL_RULES: Array<{ test: RegExp; label: string }> = [
     label: '🎓 Curso gratis',
   },
   {
-    test: /masterclass/i,
-    label: '📚 Masterclass',
+    test: /90%|hacerse rico/i,
+    label: '90% DSCTO',
   },
   {
     test: /gift card/i,
@@ -36,8 +36,8 @@ const SHORT_LABEL_RULES: Array<{ test: RegExp; label: string }> = [
     label: '🔋 Powerbank',
   },
   {
-    test: /entrada para cine/i,
-    label: '🎟️ Cine',
+    test: /50%.*curso|cualquier curso/i,
+    label: '50% Cursos',
   },
   {
     test: /no pierdas la fe/i,

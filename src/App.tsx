@@ -22,7 +22,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option: '📚 Acceso a masterclass de negocios digitales',
+    option: '90% DSCTO Curso de Como hacerse rico desde 0',
     isLose: false,
   },
   {
@@ -62,7 +62,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option: '🎟️ Entrada para cine',
+    option: '50% en cualquier curso de lernymart',
     isLose: false,
   },
   {
