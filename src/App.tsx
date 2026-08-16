@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import confetti from 'canvas-confetti'
 import { ControlPanel } from './components/ControlPanel'
 import { SmartwatchRevealModal } from './components/SmartwatchRevealModal'
+import { WelcomeModal } from './components/WelcomeModal'
 import { WheelPreview } from './components/WheelPreview'
 import { WinnerModal } from './components/WinnerModal'
 import type {
@@ -11,14 +12,8 @@ import type {
 } from './types/wheel'
 
 const SPIN_COUNT_KEY = 'ruleta:spinCount'
-
-const SMARTWATCH_ID = 'smartwatch-prize'
-
-const SMARTWATCH_OPTION: WheelOption = {
-  id: SMARTWATCH_ID,
-  option: '⌚ Smartwatch',
-  isLose: false,
-}
+const WELCOME_SEEN_KEY = 'ruleta:welcomeSeen'
+const SMARTWATCH_REDEEMED_KEY = 'ruleta:smartwatchRedeemed'
 
 const INITIAL_OPTIONS: WheelOption[] = [
   {
@@ -114,11 +109,43 @@ function persistSpinCount(count: number) {
   }
 }
 
+function hasSeenWelcome(): boolean {
+  try {
+    return localStorage.getItem(WELCOME_SEEN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function persistWelcomeSeen() {
+  try {
+    localStorage.setItem(WELCOME_SEEN_KEY, '1')
+  } catch {
+    // Ignora cuota llena o modo privado.
+  }
+}
+
+function isSmartwatchRedeemed(): boolean {
+  try {
+    return localStorage.getItem(SMARTWATCH_REDEEMED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function persistSmartwatchRedeemed() {
+  try {
+    localStorage.setItem(SMARTWATCH_REDEEMED_KEY, '1')
+  } catch {
+    // Ignora cuota llena o modo privado.
+  }
+}
+
 function fireConfetti() {
   const count = 180
   const defaults = {
     origin: { y: 0.65 },
-    zIndex: 60,
+    zIndex: 90,
   }
 
   confetti({
@@ -151,12 +178,27 @@ export default function App() {
   const [colors, setColors] = useState<WheelColors>(INITIAL_COLORS)
   const [branding, setBranding] = useState<WheelBranding>(INITIAL_BRANDING)
 
-  const [spinCount, setSpinCount] = useState(readStoredSpinCount)
-  const [isSmartwatchActive, setIsSmartwatchActive] = useState(
-    () => readStoredSpinCount() === 20,
+  const [spinCount, setSpinCount] = useState(() => {
+    const stored = readStoredSpinCount()
+    if (isSmartwatchRedeemed() && stored === 20) {
+      persistSpinCount(0)
+      return 0
+    }
+    return stored
+  })
+  const [smartwatchRedeemed, setSmartwatchRedeemed] = useState(
+    isSmartwatchRedeemed,
   )
-  const [pendingSmartwatchReveal, setPendingSmartwatchReveal] = useState(false)
-  const [showSmartwatchReveal, setShowSmartwatchReveal] = useState(false)
+  const [showSmartwatchPopup, setShowSmartwatchPopup] = useState(
+    () => readStoredSpinCount() === 20 && !isSmartwatchRedeemed(),
+  )
+  const [showWelcomePopup, setShowWelcomePopup] = useState(() => {
+    const pendingSmartwatch =
+      readStoredSpinCount() === 20 && !isSmartwatchRedeemed()
+    if (hasSeenWelcome() || pendingSmartwatch) return false
+    persistWelcomeSeen()
+    return true
+  })
 
   const [mustSpin, setMustSpin] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
@@ -164,72 +206,52 @@ export default function App() {
   const [result, setResult] = useState<{
     label: string
     isLose: boolean
-    isSmartwatch: boolean
   } | null>(null)
 
-  const wheelOptions = useMemo(
-    () => (isSmartwatchActive ? [...options, SMARTWATCH_OPTION] : options),
-    [options, isSmartwatchActive],
-  )
-
-  const resetSmartwatchCycle = useCallback(() => {
-    setIsSmartwatchActive(false)
-    setSpinCount(0)
-    persistSpinCount(0)
-  }, [])
-
   const handleSpin = useCallback(() => {
-    if (mustSpin || wheelOptions.length < 2) return
+    if (mustSpin || options.length < 2) return
 
-    const randomIndex = Math.floor(Math.random() * wheelOptions.length)
+    const randomIndex = Math.floor(Math.random() * options.length)
     setPrizeNumber(randomIndex)
     setMustSpin(true)
     setResult(null)
-  }, [mustSpin, wheelOptions.length])
+  }, [mustSpin, options.length])
 
   const handleStopSpinning = useCallback(() => {
     setMustSpin(false)
-    const selected = wheelOptions[prizeNumber]
+    const selected = options[prizeNumber]
     const label = selected?.option.trim() || '—'
     const isLose = Boolean(selected?.isLose)
-    const wonSmartwatch = selected?.id === SMARTWATCH_ID
 
-    setResult({ label, isLose, isSmartwatch: wonSmartwatch })
+    setResult({ label, isLose })
 
     if (!isLose) {
       fireConfetti()
-    }
-
-    if (isSmartwatchActive) {
-      resetSmartwatchCycle()
-      return
     }
 
     const nextCount = spinCount + 1
     setSpinCount(nextCount)
     persistSpinCount(nextCount)
 
-    if (nextCount === 20) {
-      setIsSmartwatchActive(true)
-      setPendingSmartwatchReveal(true)
-    }
-  }, [
-    wheelOptions,
-    prizeNumber,
-    isSmartwatchActive,
-    spinCount,
-    resetSmartwatchCycle,
-  ])
-
-  const handleCloseResult = useCallback(() => {
-    setResult(null)
-
-    if (pendingSmartwatchReveal) {
-      setPendingSmartwatchReveal(false)
-      setShowSmartwatchReveal(true)
+    if (nextCount === 20 && !smartwatchRedeemed) {
+      setShowSmartwatchPopup(true)
       fireConfetti()
     }
-  }, [pendingSmartwatchReveal])
+  }, [options, prizeNumber, spinCount, smartwatchRedeemed])
+
+  const handleRedeemSmartwatch = useCallback(() => {
+    setSmartwatchRedeemed(true)
+    persistSmartwatchRedeemed()
+    setSpinCount(0)
+    persistSpinCount(0)
+  }, [])
+
+  const handleCloseSmartwatchPopup = useCallback(() => {
+    if (!smartwatchRedeemed) {
+      handleRedeemSmartwatch()
+    }
+    setShowSmartwatchPopup(false)
+  }, [smartwatchRedeemed, handleRedeemSmartwatch])
 
   return (
     <div className="flex min-h-screen">
@@ -246,7 +268,7 @@ export default function App() {
 
       <main className="relative min-h-screen min-w-0 flex-1">
         <WheelPreview
-          options={wheelOptions}
+          options={options}
           colors={colors}
           branding={branding}
           mustSpin={mustSpin}
@@ -262,21 +284,29 @@ export default function App() {
           result={result.label}
           isLose={result.isLose}
           message={
-            result.isSmartwatch
-              ? '¡Increíble! Te llevas el premio sorpresa:'
-              : result.isLose
-                ? branding.loseMessage.trim() ||
-                  '¡Casi! Esta vez no hubo premio.'
-                : branding.winnerMessage.trim() ||
-                  '¡Felicidades! Has ganado:'
+            result.isLose
+              ? branding.loseMessage.trim() ||
+                '¡Casi! Esta vez no hubo premio.'
+              : branding.winnerMessage.trim() ||
+                '¡Felicidades! Has ganado:'
           }
-          onClose={handleCloseResult}
+          onClose={() => setResult(null)}
         />
       )}
 
-      {showSmartwatchReveal && (
+      {showWelcomePopup && (
+        <WelcomeModal
+          onClose={() => {
+            persistWelcomeSeen()
+            setShowWelcomePopup(false)
+          }}
+        />
+      )}
+
+      {showSmartwatchPopup && (
         <SmartwatchRevealModal
-          onClose={() => setShowSmartwatchReveal(false)}
+          onRedeem={handleRedeemSmartwatch}
+          onClose={handleCloseSmartwatchPopup}
         />
       )}
     </div>
