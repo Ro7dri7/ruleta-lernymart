@@ -28,6 +28,10 @@ const SHORT_LABEL_RULES: Array<{ test: RegExp; label: string }> = [
     label: '🎧 Auriculares',
   },
   {
+    test: /smartwatch/i,
+    label: '⌚ Smartwatch',
+  },
+  {
     test: /parlante/i,
     label: '🎵 Parlante',
   },

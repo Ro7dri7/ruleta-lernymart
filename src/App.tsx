@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import confetti from 'canvas-confetti'
 import { ControlPanel } from './components/ControlPanel'
+import { SmartwatchRevealModal } from './components/SmartwatchRevealModal'
 import { WheelPreview } from './components/WheelPreview'
 import { WinnerModal } from './components/WinnerModal'
 import type {
@@ -8,6 +9,16 @@ import type {
   WheelColors,
   WheelOption,
 } from './types/wheel'
+
+const SPIN_COUNT_KEY = 'ruleta:spinCount'
+
+const SMARTWATCH_ID = 'smartwatch-prize'
+
+const SMARTWATCH_OPTION: WheelOption = {
+  id: SMARTWATCH_ID,
+  option: '⌚ Smartwatch',
+  isLose: false,
+}
 
 const INITIAL_OPTIONS: WheelOption[] = [
   {
@@ -84,6 +95,25 @@ const INITIAL_BRANDING: WheelBranding = {
   loseMessage: '¡Casi! Esta vez no hubo premio.',
 }
 
+function readStoredSpinCount(): number {
+  try {
+    const raw = localStorage.getItem(SPIN_COUNT_KEY)
+    const parsed = Number.parseInt(raw ?? '0', 10)
+    if (!Number.isFinite(parsed) || parsed < 0) return 0
+    return parsed
+  } catch {
+    return 0
+  }
+}
+
+function persistSpinCount(count: number) {
+  try {
+    localStorage.setItem(SPIN_COUNT_KEY, String(count))
+  } catch {
+    // Ignora cuota llena o modo privado.
+  }
+}
+
 function fireConfetti() {
   const count = 180
   const defaults = {
@@ -121,35 +151,85 @@ export default function App() {
   const [colors, setColors] = useState<WheelColors>(INITIAL_COLORS)
   const [branding, setBranding] = useState<WheelBranding>(INITIAL_BRANDING)
 
+  const [spinCount, setSpinCount] = useState(readStoredSpinCount)
+  const [isSmartwatchActive, setIsSmartwatchActive] = useState(
+    () => readStoredSpinCount() === 20,
+  )
+  const [pendingSmartwatchReveal, setPendingSmartwatchReveal] = useState(false)
+  const [showSmartwatchReveal, setShowSmartwatchReveal] = useState(false)
+
   const [mustSpin, setMustSpin] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [result, setResult] = useState<{
     label: string
     isLose: boolean
+    isSmartwatch: boolean
   } | null>(null)
 
-  const handleSpin = useCallback(() => {
-    if (mustSpin || options.length < 2) return
+  const wheelOptions = useMemo(
+    () => (isSmartwatchActive ? [...options, SMARTWATCH_OPTION] : options),
+    [options, isSmartwatchActive],
+  )
 
-    const randomIndex = Math.floor(Math.random() * options.length)
+  const resetSmartwatchCycle = useCallback(() => {
+    setIsSmartwatchActive(false)
+    setSpinCount(0)
+    persistSpinCount(0)
+  }, [])
+
+  const handleSpin = useCallback(() => {
+    if (mustSpin || wheelOptions.length < 2) return
+
+    const randomIndex = Math.floor(Math.random() * wheelOptions.length)
     setPrizeNumber(randomIndex)
     setMustSpin(true)
     setResult(null)
-  }, [mustSpin, options.length])
+  }, [mustSpin, wheelOptions.length])
 
   const handleStopSpinning = useCallback(() => {
     setMustSpin(false)
-    const selected = options[prizeNumber]
+    const selected = wheelOptions[prizeNumber]
     const label = selected?.option.trim() || '—'
     const isLose = Boolean(selected?.isLose)
+    const wonSmartwatch = selected?.id === SMARTWATCH_ID
 
-    setResult({ label, isLose })
+    setResult({ label, isLose, isSmartwatch: wonSmartwatch })
 
     if (!isLose) {
       fireConfetti()
     }
-  }, [options, prizeNumber])
+
+    if (isSmartwatchActive) {
+      resetSmartwatchCycle()
+      return
+    }
+
+    const nextCount = spinCount + 1
+    setSpinCount(nextCount)
+    persistSpinCount(nextCount)
+
+    if (nextCount === 20) {
+      setIsSmartwatchActive(true)
+      setPendingSmartwatchReveal(true)
+    }
+  }, [
+    wheelOptions,
+    prizeNumber,
+    isSmartwatchActive,
+    spinCount,
+    resetSmartwatchCycle,
+  ])
+
+  const handleCloseResult = useCallback(() => {
+    setResult(null)
+
+    if (pendingSmartwatchReveal) {
+      setPendingSmartwatchReveal(false)
+      setShowSmartwatchReveal(true)
+      fireConfetti()
+    }
+  }, [pendingSmartwatchReveal])
 
   return (
     <div className="flex min-h-screen">
@@ -166,7 +246,7 @@ export default function App() {
 
       <main className="relative min-h-screen min-w-0 flex-1">
         <WheelPreview
-          options={options}
+          options={wheelOptions}
           colors={colors}
           branding={branding}
           mustSpin={mustSpin}
@@ -182,13 +262,21 @@ export default function App() {
           result={result.label}
           isLose={result.isLose}
           message={
-            result.isLose
-              ? branding.loseMessage.trim() ||
-                '¡Casi! Esta vez no hubo premio.'
-              : branding.winnerMessage.trim() ||
-                '¡Felicidades! Has ganado:'
+            result.isSmartwatch
+              ? '¡Increíble! Te llevas el premio sorpresa:'
+              : result.isLose
+                ? branding.loseMessage.trim() ||
+                  '¡Casi! Esta vez no hubo premio.'
+                : branding.winnerMessage.trim() ||
+                  '¡Felicidades! Has ganado:'
           }
-          onClose={() => setResult(null)}
+          onClose={handleCloseResult}
+        />
+      )}
+
+      {showSmartwatchReveal && (
+        <SmartwatchRevealModal
+          onClose={() => setShowSmartwatchReveal(false)}
         />
       )}
     </div>
