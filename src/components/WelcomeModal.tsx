@@ -65,19 +65,19 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
           <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-gold">
             <Sparkles className="size-3.5" />
-            Premio escondido
+            Premios escondidos
           </p>
 
           <h2
             id="welcome-popup-title"
             className="mt-4 font-display text-[1.85rem] font-extrabold leading-tight sm:text-4xl"
           >
-            ¡Hay un premio secreto en la ruleta!
+            ¡Hay más de 1 premio escondido en la ruleta!
           </h2>
 
           <p className="mt-3 text-base font-medium text-white/90 sm:text-lg">
-            Gira ahora y atrápalo. Cuanto más juegues, más cerca estás de
-            llevártelo.
+            Gira ahora y atrápalos. Cuanto más juegues, más cerca estás de
+            llevártelos.
           </p>
 
           <button

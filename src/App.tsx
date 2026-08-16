@@ -1,7 +1,10 @@
 import { useCallback, useState } from 'react'
 import confetti from 'canvas-confetti'
 import { ControlPanel } from './components/ControlPanel'
-import { SmartwatchRevealModal } from './components/SmartwatchRevealModal'
+import {
+  SurpriseBonusModal,
+  type SurprisePrize,
+} from './components/SurpriseBonusModal'
 import { WelcomeModal } from './components/WelcomeModal'
 import { WheelPreview } from './components/WheelPreview'
 import { WinnerModal } from './components/WinnerModal'
@@ -13,7 +16,6 @@ import type {
 
 const SPIN_COUNT_KEY = 'ruleta:spinCount'
 const WELCOME_SEEN_KEY = 'ruleta:welcomeSeen'
-const SMARTWATCH_REDEEMED_KEY = 'ruleta:smartwatchRedeemed'
 
 const INITIAL_OPTIONS: WheelOption[] = [
   {
@@ -125,20 +127,10 @@ function persistWelcomeSeen() {
   }
 }
 
-function isSmartwatchRedeemed(): boolean {
-  try {
-    return localStorage.getItem(SMARTWATCH_REDEEMED_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
-function persistSmartwatchRedeemed() {
-  try {
-    localStorage.setItem(SMARTWATCH_REDEEMED_KEY, '1')
-  } catch {
-    // Ignora cuota llena o modo privado.
-  }
+/** Impares (1, 3, 5…) → curso; pares (2, 4, 6…) → masterclass. */
+function surprisePrizeForCount(count: number): SurprisePrize | null {
+  if (count <= 0 || count % 5 !== 0) return null
+  return (count / 5) % 2 === 1 ? 'curso' : 'masterclass'
 }
 
 function fireConfetti() {
@@ -178,24 +170,11 @@ export default function App() {
   const [colors, setColors] = useState<WheelColors>(INITIAL_COLORS)
   const [branding, setBranding] = useState<WheelBranding>(INITIAL_BRANDING)
 
-  const [spinCount, setSpinCount] = useState(() => {
-    const stored = readStoredSpinCount()
-    if (isSmartwatchRedeemed() && stored === 20) {
-      persistSpinCount(0)
-      return 0
-    }
-    return stored
-  })
-  const [smartwatchRedeemed, setSmartwatchRedeemed] = useState(
-    isSmartwatchRedeemed,
-  )
-  const [showSmartwatchPopup, setShowSmartwatchPopup] = useState(
-    () => readStoredSpinCount() === 20 && !isSmartwatchRedeemed(),
-  )
+  const [spinCount, setSpinCount] = useState(readStoredSpinCount)
+  const [showSurprisePopup, setShowSurprisePopup] = useState(false)
+  const [surprisePrize, setSurprisePrize] = useState<SurprisePrize | null>(null)
   const [showWelcomePopup, setShowWelcomePopup] = useState(() => {
-    const pendingSmartwatch =
-      readStoredSpinCount() === 20 && !isSmartwatchRedeemed()
-    if (hasSeenWelcome() || pendingSmartwatch) return false
+    if (hasSeenWelcome()) return false
     persistWelcomeSeen()
     return true
   })
@@ -233,25 +212,13 @@ export default function App() {
     setSpinCount(nextCount)
     persistSpinCount(nextCount)
 
-    if (nextCount === 20 && !smartwatchRedeemed) {
-      setShowSmartwatchPopup(true)
+    const bonus = surprisePrizeForCount(nextCount)
+    if (bonus) {
+      setSurprisePrize(bonus)
+      setShowSurprisePopup(true)
       fireConfetti()
     }
-  }, [options, prizeNumber, spinCount, smartwatchRedeemed])
-
-  const handleRedeemSmartwatch = useCallback(() => {
-    setSmartwatchRedeemed(true)
-    persistSmartwatchRedeemed()
-    setSpinCount(0)
-    persistSpinCount(0)
-  }, [])
-
-  const handleCloseSmartwatchPopup = useCallback(() => {
-    if (!smartwatchRedeemed) {
-      handleRedeemSmartwatch()
-    }
-    setShowSmartwatchPopup(false)
-  }, [smartwatchRedeemed, handleRedeemSmartwatch])
+  }, [options, prizeNumber, spinCount])
 
   return (
     <div className="flex min-h-screen">
@@ -303,10 +270,10 @@ export default function App() {
         />
       )}
 
-      {showSmartwatchPopup && (
-        <SmartwatchRevealModal
-          onRedeem={handleRedeemSmartwatch}
-          onClose={handleCloseSmartwatchPopup}
+      {showSurprisePopup && surprisePrize !== null && (
+        <SurpriseBonusModal
+          prize={surprisePrize}
+          onClose={() => setShowSurprisePopup(false)}
         />
       )}
     </div>
