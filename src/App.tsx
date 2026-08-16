@@ -32,7 +32,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option: '💳 Gift Card S/250',
+    option: '🎧 Auriculares',
     isLose: false,
   },
   {

@@ -24,8 +24,8 @@ const SHORT_LABEL_RULES: Array<{ test: RegExp; label: string }> = [
     label: '90% DSCTO',
   },
   {
-    test: /gift card/i,
-    label: '💳 Gift Card',
+    test: /auriculares/i,
+    label: '🎧 Auriculares',
   },
   {
     test: /parlante/i,
