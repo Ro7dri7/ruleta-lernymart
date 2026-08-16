@@ -12,8 +12,7 @@ import type {
 const INITIAL_OPTIONS: WheelOption[] = [
   {
     id: crypto.randomUUID(),
-    option:
-      'Espacio destacado en la web principal del Marketplace por 01 semana',
+    option: '🎓 Curso gratis',
     isLose: false,
   },
   {
@@ -23,8 +22,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option:
-      'Mentoría gratuita 1:1 para estructurar tu infoproducto con el equipo de onboarding',
+    option: '📚 Acceso a masterclass de negocios digitales',
     isLose: false,
   },
   {
@@ -34,8 +32,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option:
-      'Exoneración de la comisión del 8% por 3 meses al publicar tu primer ebook/curso',
+    option: '💳 Gift Card S/250',
     isLose: false,
   },
   {
@@ -45,8 +42,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option:
-      'Espacio destacado en la web principal del Marketplace por 01 semana',
+    option: '🎵 Parlante',
     isLose: false,
   },
   {
@@ -56,8 +52,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option:
-      'Mentoría gratuita 1:1 para estructurar tu infoproducto con el equipo de onboarding',
+    option: '🔋 Powerbank',
     isLose: false,
   },
   {
@@ -67,8 +62,7 @@ const INITIAL_OPTIONS: WheelOption[] = [
   },
   {
     id: crypto.randomUUID(),
-    option:
-      'Exoneración de la comisión del 8% por 3 meses al publicar tu primer ebook/curso',
+    option: '🎟️ Entrada para cine',
     isLose: false,
   },
   {

@@ -16,16 +16,28 @@ interface WheelPreviewProps {
 
 const SHORT_LABEL_RULES: Array<{ test: RegExp; label: string }> = [
   {
-    test: /espacio destacado/i,
-    label: 'Espacio web 1 sem.',
+    test: /curso gratis/i,
+    label: '🎓 Curso gratis',
   },
   {
-    test: /mentor[ií]a gratuita/i,
-    label: 'Mentoría 1:1',
+    test: /masterclass/i,
+    label: '📚 Masterclass',
   },
   {
-    test: /exoneraci[oó]n/i,
-    label: 'Exoneración 8%',
+    test: /gift card/i,
+    label: '💳 Gift Card',
+  },
+  {
+    test: /parlante/i,
+    label: '🎵 Parlante',
+  },
+  {
+    test: /powerbank/i,
+    label: '🔋 Powerbank',
+  },
+  {
+    test: /entrada para cine/i,
+    label: '🎟️ Cine',
   },
   {
     test: /no pierdas la fe/i,
